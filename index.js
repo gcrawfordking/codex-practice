@@ -4,7 +4,20 @@ let counter = 0;
 const port = process.env.PORT || 3000;
 
 const server = http.createServer((req, res) => {
-  const pathname = new URL(req.url, 'http://localhost').pathname;
+  const { pathname, searchParams } = new URL(req.url, 'http://localhost');
+
+  if (pathname === '/reverse') {
+    const text = searchParams.get('text');
+    if (text === null) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Missing text query parameter' }));
+      return;
+    }
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(Array.from(text).reverse().join('')));
+    return;
+  }
 
   if (pathname === '/teapot') {
     counter += 1;
